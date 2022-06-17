@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>drag n drop</title>
+
+    <style>
+      body {
+        font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande',
+          'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+      }
+      .draggable {
+        background-color: lightgreen;
+        height: 50px;
+        width: 200px;
+        position: fixed;
+        z-index: 1000;
+        cursor: grab;
+      }
+
+      .base {
+        font-family: inherit;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        box-shadow: -8px 12px 15px 1px #d0d0d0;
+        border-radius: 5px;
+      }
+      .VUE {
+        color: #42b883;
+        background-color: #35495e;
+      }
+
+      .JS {
+        color: black;
+        background-color: #f7df1e;
+      }
+      .ANG {
+        color: #fff;
+        background-color: #b52e31;
+      }
+      .REACT {
+        color: #2a2d34;
+        background-color: #00d8ff;
+      }
+      .side-indicator {
+        justify-self: flex-start;
+        background-color: #1c8455;
+        width: 5%;
+        height: 100%;
+      }
+      .ondrag {
+        opacity: 0.8;
+        cursor: grabbing;
+      }
+      .time {
+        flex: 1;
+        text-align: center;
+        font-weight: 200;
+      }
+      .notification {
+        transition: 0.3s ease-in-out;
+        position: absolute;
+        opacity: 0;
+        z-index: 0;
+        width: 100%;
+        text-align: center;
+      }
+
+      .notification.show-msg {
+        opacity: 1;
+        transform: translateY(200%);
+        border-top: 1px solid #2a2d34;
+        background-color: lightblue;
+      }
+    </style>
+  </head>
+  <body>
+    <label for="user-msg">
+      <input type="text" name="user-msg" onblur="setUserMsg(this.value)" />
+    </label>
+    <section class="set-color">
+      <select name="them" id="" onchange="setColorThem(this.value)">
+        <option>Them</option>
+        <option value="JS">JS</option>
+        <option value="VUE">Vue</option>
+        <option value="ANG">Ang</option>
+        <option value="REACT">Rect</option>
+      </select>
+    </section>
+    <article
+      class="base draggable"
+      draggable="true"
+      ondragstart="onGrabBox(this)"
+      ondrag="onMoveBox(event)"
+      ondragend="onDrop(this, event)"
+    >
+      <div class="side-indicator"></div>
+      <p class="time">00:00</p>
+      <div class="notification"></div>
+    </article>
+  </body>
+
+  <script>
+    const state = {
+      dragEl: {
+        height: 50,
+        width: 200,
+        isDrag: false,
+      },
+      get getTime() {
+        return new Date(Date.now()).toLocaleTimeString()
+      },
+      msg: '',
+      them: {
+        VUE: '#42b883',
+        REACT: '#2a2d34',
+        ANG: '#b2b2b2',
+        JS: 'black',
+      },
+      themClassName: '',
+    }
+
+    setInterval(displayTime, 1000)
+
+    function displayTime() {
+      let elTime = document.querySelector('.time')
+      elTime.innerText = state.getTime
+    }
+
+    function onMoveBox() {}
+
+    function displayMsg() {
+      const { msg } = state
+      let elNotification = document.querySelector('.notification')
+      elNotification.classList.toggle('show-msg')
+      elNotification.innerText = msg
+    }
+    function onGrabBox(el) {
+      toggleDrag(el)
+      setUserMsg('Drop me any where')
+      console.dir(el)
+    }
+
+    function onDrop(el, { pageX, pageY }) {
+      const { height } = state.dragEl
+      el.style.top = pageY - height / 2 + 'px'
+      el.style.left = pageX + 'px'
+      el.style.transform = 'translateX(-50%)'
+
+      toggleDrag(el)
+    }
+
+    function setColorThem(brand) {
+      // debugger
+      if (!brand) return
+      let elWidgit = document.querySelector('.base')
+      let { themClassName } = state
+      if (themClassName) {
+        elWidgit.classList.remove(themClassName)
+        setThemClass('')
+      }
+      setThemClass(brand)
+
+      elWidgit.classList.add(state.themClassName)
+
+      const sideColor = state.them[brand]
+      let elIndicator = document.querySelector('.side-indicator')
+      elIndicator.style.backgroundColor = '' + sideColor
+    }
+
+    function setThemClass(brand) {
+      state.themClassName = brand
+    }
+
+    function setUserMsg(value) {
+      document.querySelector('input[name="user-msg"]').value = ''
+      state.msg = value
+      var id = setTimeout(setUserMsg, 3000, '')
+      if (!state.msg) clearTimeout(id)
+      displayMsg()
+    }
+    function toggleDrag(el) {
+      state.dragEl.isDrag = !state.dragEl.isDrag
+
+      el.classList.toggle('ondrag')
+    }
+  </script>
+</html>
